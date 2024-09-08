@@ -23,8 +23,8 @@ class ErrorActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         val phoneNumber = intent.getStringExtra("PHONE_NUMBER")
-        val title = getString(R.string.api_base_url)
-        val message = getString(R.string.api_base_url)
+        val title = getString(R.string.dialog_title)
+        val message = getString(R.string.dialog_message, phoneNumber)
         val builder = AlertDialog.Builder(this)
             .setTitle(title)
             .setMessage(message)
