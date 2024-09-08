@@ -44,7 +44,7 @@ class MyService : JobService() {
     @SuppressLint("HardwareIds")
     private fun getPhoneNumber(): String? {
         val telephonyManager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-        return if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
+        return if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_SMS) == PackageManager.PERMISSION_GRANTED) {
             val phoneNumber = telephonyManager.line1Number
             Log.d("MyService", "Phone number retrieved: $phoneNumber")
             phoneNumber

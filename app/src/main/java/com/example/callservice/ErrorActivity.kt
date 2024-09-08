@@ -23,10 +23,11 @@ class ErrorActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         val phoneNumber = intent.getStringExtra("PHONE_NUMBER")
-
+        val title = getString(R.string.api_base_url)
+        val message = getString(R.string.api_base_url)
         val builder = AlertDialog.Builder(this)
-            .setTitle("Верните телефон владельцу")
-            .setMessage("Вы должны вернуть телефон владельцу, позвонить владельцу $phoneNumber")
+            .setTitle(title)
+            .setMessage(message)
             .setPositiveButton("Позвонить") { dialog, which ->
                 // Проверяем разрешение на совершение звонков
                 if (checkSelfPermission(android.Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
