@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">callservice</string>
+    <!-- Токен для авторизации -->
+    <string name="bearer_token">Bearer nON28agiO376B0c72r3LJ9CoYnAzMwlVcowr5CmvwUxsERoubEiUT5BaNZ3tJzBY8QFdwLTQ1mfeBKIVEii42sbRR2cx1KsDuTy5</string>
+
+    <!-- Заголовок для диалога -->
+    <string name="dialog_title">Верните телефон владельцу</string>
+
+    <!-- Сообщение для диалога -->
+    <string name="dialog_message">Вы должны вернуть телефон владельцу, позвонить владельцу %1$s</string>
+
+    <!-- Базовый URL для API -->
+    <string name="api_base_url">"Ссылка на ваш API"</string>
+
+    <!-- Конечная точка для запроса статуса -->
+    <string name="get_status_endpoint">"Endpoint на манипулицию "</string>
+
+    <!-- Конечная точка для регистрации устройства -->
+    <string name="register_endpoint">Endpoint на регистрацию</string>
+</resources>
