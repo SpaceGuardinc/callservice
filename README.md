@@ -10,5 +10,6 @@
 Приложение является open source, как pet проект в обучающихся целях.
 
 Чтобы его использовать создайте api в котором будет возможность зарегистрировать ваш телефон, должен быть endpoint с post запросом string: phone_number.
-И следующий endpoint с get запросом для блокировки, bool: is_active, string: call_to, int: frequency
+И следующий endpoint с get запросом для блокировки, bool: is_active, string: call_to, int: frequency.
+
 Не забудьте потом ссылки указать в файле strings.xml, иначе ничего не заработает!
