@@ -91,7 +91,6 @@ class MainActivity : AppCompatActivity() {
         Log.d("MyService", "UUID успешно сохранён в базу данных: $uuid")
         // Здесь добавляем вызов функции отправки номера и UUID в API
         sendPhoneNumberAndUUIDToApi(getPhoneNumber(), uuid)
-
     }
 
     private fun sendPhoneNumberAndUUIDToApi(phoneNumber: String?, uuid: String) {

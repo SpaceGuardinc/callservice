@@ -81,7 +81,7 @@ class MyService : JobService() {
         val request = Request.Builder()
             .url(statusUrl)
             .get()
-            .addHeader("Authorization", "Bearer $bearerToken")
+            .addHeader("Authorization", bearerToken)
             .build()
 
         client.newCall(request).enqueue(object : Callback {
