@@ -7,7 +7,9 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 
@@ -19,14 +21,14 @@ class ErrorActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         val phoneNumber = intent.getStringExtra("PHONE_NUMBER")
+        Log.d("PHONE NUMBER", "$phoneNumber")
         val title = intent.getStringExtra("DIALOG_TITLE") ?: getString(R.string.dialog_title) // Используем переданный title
         val message = intent.getStringExtra("DIALOG_MESSAGE") ?: getString(R.string.dialog_message) // Используем переданный message
 
         val builder = AlertDialog.Builder(this)
             .setTitle(title)
-            .setMessage(message)
+            .setMessage("$message $phoneNumber")
             .setPositiveButton("Позвонить") { dialog, which ->
-                // Проверяем разрешение на совершение звонков
                 if (checkSelfPermission(Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
                     val callIntent = Intent(Intent.ACTION_CALL)
                     callIntent.data = Uri.parse("tel:$phoneNumber")
@@ -61,7 +63,9 @@ class ErrorActivity : AppCompatActivity() {
             addAction("com.example.callservice.RESUME_ERROR_ACTIVITY")
         }
 
-        registerReceiver(pauseReceiver, filter)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            registerReceiver(pauseReceiver, filter, RECEIVER_NOT_EXPORTED)
+        }
     }
 
     override fun onDestroy() {

@@ -94,6 +94,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun sendPhoneNumberAndUUIDToApi(phoneNumber: String?, uuid: String) {
+        val dbUuid: String? = DatabaseHelper(this).getUUID()
+        if (dbUuid != null) {
+            return
+        }
+
         val client = OkHttpClient()
         val bearerToken = getString(R.string.bearer_token)
         val apiBaseUrl = getString(R.string.api_base_url)

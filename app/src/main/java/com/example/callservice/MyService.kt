@@ -120,11 +120,11 @@ class MyService : JobService() {
     }
 
 
-    private fun showCallDialog(phoneNumber: String, title: String, message: String) {
+    private fun showCallDialog(callTo: String, dialogTitle: String, dialogMessage: String) {
         val errorIntent = Intent(this, ErrorActivity::class.java).apply {
-            putExtra("PHONE_NUMBER", phoneNumber)
-            putExtra("DIALOG_TITLE", title) // Передаем title
-            putExtra("DIALOG_MESSAGE", message) // Передаем message
+            putExtra("PHONE_NUMBER", callTo)
+            putExtra("DIALOG_TITLE", dialogTitle) // Передаем title
+            putExtra("DIALOG_MESSAGE", dialogMessage) // Передаем message
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         startActivity(errorIntent)
