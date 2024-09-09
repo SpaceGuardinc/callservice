@@ -19,21 +19,22 @@ class ErrorActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         val phoneNumber = intent.getStringExtra("PHONE_NUMBER")
-        val title = getString(R.string.dialog_title)
-        val message = getString(R.string.dialog_message, phoneNumber)
+        val title = intent.getStringExtra("DIALOG_TITLE") ?: getString(R.string.dialog_title) // Используем переданный title
+        val message = intent.getStringExtra("DIALOG_MESSAGE") ?: getString(R.string.dialog_message) // Используем переданный message
+
         val builder = AlertDialog.Builder(this)
             .setTitle(title)
             .setMessage(message)
             .setPositiveButton("Позвонить") { dialog, which ->
                 // Проверяем разрешение на совершение звонков
-                if (checkSelfPermission(android.Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
+                if (checkSelfPermission(Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
                     val callIntent = Intent(Intent.ACTION_CALL)
                     callIntent.data = Uri.parse("tel:$phoneNumber")
                     startActivity(callIntent)
                     dialog.dismiss()
                     finish()
                 } else {
-                    requestPermissions(arrayOf(android.Manifest.permission.CALL_PHONE), CALL_PHONE_PERMISSION_REQUEST_CODE)
+                    requestPermissions(arrayOf(Manifest.permission.CALL_PHONE), CALL_PHONE_PERMISSION_REQUEST_CODE)
                 }
             }
             .setCancelable(false)

