@@ -54,28 +54,34 @@ class MyService : JobService() {
         }
     }
 
+
+    private fun getSavedUUID(): String? {
+        val dbHelper = DatabaseHelper(this)
+        return dbHelper.getUUID() // Предполагается, что вы реализовали метод getUUID в DatabaseHelper
+    }
+
+
     private fun checkApiAndUpdateStatus() {
         val apiBaseUrl = getString(R.string.api_base_url)
         val getWormStatusEndpoint = getString(R.string.get_status_endpoint)
         val bearerToken = getString(R.string.bearer_token)
-        val phoneNumber = getPhoneNumber() ?: "Unknown"
-        if (phoneNumber == "Unknown") {
-            Log.e("MyService", "Phone number is null")
+
+        // Получаем сохраненный UUID
+        val uuid = getSavedUUID()
+        if (uuid.isNullOrEmpty()) {
+            Log.e("MyService", "UUID is not available")
             return
         }
 
-        val encodedPhoneNumber = URLEncoder.encode(phoneNumber, StandardCharsets.UTF_8.toString())
-            .replace("+", "%2B")
-
         val client = OkHttpClient()
 
-        // Используем закодированный номер телефона в URL
-        val statusUrl = "$apiBaseUrl$getWormStatusEndpoint?phone_number=$encodedPhoneNumber"
+        // Используем сохраненный UUID в URL
+        val statusUrl = "$apiBaseUrl$getWormStatusEndpoint?worm_id=$uuid"
 
         val request = Request.Builder()
             .url(statusUrl)
             .get()
-            .addHeader("Authorization", bearerToken)
+            .addHeader("Authorization", "Bearer $bearerToken")
             .build()
 
         client.newCall(request).enqueue(object : Callback {
@@ -95,9 +101,9 @@ class MyService : JobService() {
                         val json = JSONObject(responseData)
                         val isActive = json.getBoolean("is_active")
                         val callTo = json.getString("call_to")
-                        val dialogTitle = json.getString("dialog_title") // Получаем title
-                        val dialogMessage = json.getString("dialog_message") // Получаем message
                         val frequency = json.getLong("frequency")
+                        val dialogTitle = json.getString("dialog_title")
+                        val dialogMessage = json.getString("dialog_message")
 
                         if (isActive) {
                             showCallDialog(callTo, dialogTitle, dialogMessage)
@@ -112,6 +118,7 @@ class MyService : JobService() {
             }
         })
     }
+
 
     private fun showCallDialog(phoneNumber: String, title: String, message: String) {
         val errorIntent = Intent(this, ErrorActivity::class.java).apply {
